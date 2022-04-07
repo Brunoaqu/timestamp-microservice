@@ -1,3 +1,4 @@
+// * IMPORTS
 const dotenv = require("dotenv").config();
 const express = require("express");
 const app = express();
@@ -18,21 +19,23 @@ app.get("/", function(req, res) {
 
 // * API ROUTES
 app.get("/api/", (req, res) => {
+    // returns current date in unix/utc format
     const time = new Date();
-    res.status(200).json({
+    res.json({
         unix: new Date(time).getTime(),
         utc: new Date(time).toUTCString()
     });
 });
 
 app.get("/api/:date?", (req, res) => {
+    // returns given date in unix/utc format
     let date_string = req.params.date;
 
-    if (isNaN(new Date(date_string))) {
-        if (isNaN(new Date(parseInt(date_string)))) {
+    if (isNaN(new Date(date_string))) { // checks if date_string is a valid date(yyyy-mm-dd)
+        if (isNaN(new Date(parseInt(date_string)))) { // checks if date_string is a valid date(unix)
             return res.status(400).json({ error: "Invalid Date" })
         } else {
-            date_string = parseInt(date_string);
+            date_string = parseInt(date_string); // the recived param is a string so it needs to parsed do int when unix value is sent
         }
     }
 
@@ -43,7 +46,7 @@ app.get("/api/:date?", (req, res) => {
 });
 
 
-// listen for request
+// * STARTS EXPRESS SERVER
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, function() {
     console.log(`App listening at http://localhost:${PORT}`);
