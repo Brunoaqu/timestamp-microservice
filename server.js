@@ -1,6 +1,5 @@
 const dotenv = require("dotenv").config();
 const express = require("express");
-const moment = require("moment");
 const app = express();
 
 
@@ -19,29 +18,28 @@ app.get("/", function(req, res) {
 
 // * API ROUTES
 app.get("/api/", (req, res) => {
-    const time = moment();
-    res.json({
-        unix: time.unix() * 1000,
+    const time = new Date();
+    res.status(200).json({
+        unix: new Date(time).getTime(),
         utc: new Date(time).toUTCString()
     });
 });
 
 app.get("/api/:date?", (req, res) => {
-    let date = req.params.date;
+    let date_string = req.params.date;
 
-    if (moment(date, "YYYY-MM-DD").isValid() || moment(parseInt(date)).isValid()) {
-        if (!moment(date, "YYYY-MM-DD").isValid()) {
-            date = parseInt(date);
+    if (isNaN(new Date(date_string))) {
+        if (isNaN(new Date(parseInt(date_string)))) {
+            return res.status(400).json({ error: "Invalid Date" })
+        } else {
+            date_string = parseInt(date_string);
         }
-
-        return res.status(200).json({
-            unix: moment(date).unix() * 1000,
-            utc: new Date(date).toUTCString()
-        });
-
-    } else {
-        return res.status(400).json({ error: "Invalid Date" })
     }
+
+    return res.status(200).json({
+        unix: new Date(date_string).getTime(),
+        utc: new Date(date_string).toUTCString()
+    });
 });
 
 
